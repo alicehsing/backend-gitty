@@ -30,9 +30,13 @@ describe('backend-gitty routes', () => {
       .get('/api/v1/github/login/callback?code=42')
       .redirects(1);
 
-    // console.log('----RESPONSE---', res);
       expect(res.req.path).toEqual('/api/v1/posts');
   });
 
+
+  it('should be able to create a post for authenticated user', async() => {
+    const agent = request.agent(app);
+    
+  })
 });
 

@@ -9,7 +9,7 @@ CREATE TABLE github_users (
     github_photo_url TEXT NOT NULL
 );
 
-CREATE TABLE tweets (
+CREATE TABLE posts (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     text VARCHAR(255) NOT NULL,
     username TEXT REFERENCES github_users(github_username)
