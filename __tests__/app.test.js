@@ -4,7 +4,7 @@ const request = require('supertest');
 const app = require('../lib/app');
 
 
-// jest.mock('../lib/utils/github');
+jest.mock('../lib/utils/github');
 
 describe('backend-gitty routes', () => {
   beforeEach(() => {
@@ -29,7 +29,8 @@ describe('backend-gitty routes', () => {
       .agent(app)
       .get('/api/v1/github/login/callback?code=42')
       .redirects(1);
-  
+
+    // console.log('----RESPONSE---', res);
       expect(res.req.path).toEqual('/api/v1/posts');
   });
 
