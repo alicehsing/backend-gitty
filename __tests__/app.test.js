@@ -2,7 +2,7 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
-const User = require('../lib/models/User');
+// const User = require('../lib/models/User');
 
 
 jest.mock('../lib/utils/github');
@@ -40,7 +40,7 @@ describe('backend-gitty routes', () => {
     const user = await agent
       .get('/api/v1/github/login/callback?code=42')
       .redirects(1);
-    console.log(user);
+  
     return agent
     .post('/api/v1/posts')
     .send({ text: 'My first tweet' })
@@ -52,6 +52,37 @@ describe('backend-gitty routes', () => {
       });
     });
 
+  });
+
+
+  it('should delete an authenticated user via DELETE', async() => {
+    const agent = request.agent(app);
+    const user = await agent
+      .get('/api/v1/github/login/callback?code=42')
+      .redirects(1);
+  
+    const res = await agent
+    .post('/api/v1/posts')
+    .send({ text: 'My first tweet' })
+    
+      expect(res.body).toEqual({
+        id: expect.any(String),
+        text: 'My first tweet',
+        username: 'fake_github_user'
+      });
+
+      const res2 = await agent.delete('/api/v1/github');
+      console.log('******', res2.body);
+      // unauthenticated user should not be able to post
+
+      const res3 = await agent 
+      .post('/api/v1/posts')
+      .send({ text: 'Another text' })
+   
+      expect(res3.body).toEqual({
+        message: 'jwt must be provided',
+        status: 500
+      })
   });
 });
 
