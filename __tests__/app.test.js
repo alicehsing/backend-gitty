@@ -38,7 +38,7 @@ describe('backend-gitty routes', () => {
 
   it('should create a post for authenticated user via POST', async() => {
     const agent = request.agent(app);
-    const user = await agent
+    await agent
       .get('/api/v1/github/login/callback?code=42')
       .redirects(1);
   
@@ -102,7 +102,6 @@ describe('backend-gitty routes', () => {
     .get('/api/v1/posts');
 
     expect(res.body).toEqual(expected);
-
   })
 });
 
