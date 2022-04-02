@@ -2,6 +2,7 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
+const Post = require('../lib/models/Post');
 // const User = require('../lib/models/User');
 
 
@@ -56,14 +57,17 @@ describe('backend-gitty routes', () => {
 
 
   it('should delete an authenticated user via DELETE', async() => {
+
+    // bring in an signed in user
     const agent = request.agent(app);
-    const user = await agent
+    await agent
       .get('/api/v1/github/login/callback?code=42')
       .redirects(1);
   
+    //signed in user post a text
     const res = await agent
-    .post('/api/v1/posts')
-    .send({ text: 'My first tweet' })
+      .post('/api/v1/posts')
+      .send({ text: 'My first tweet' })
     
       expect(res.body).toEqual({
         id: expect.any(String),
@@ -71,18 +75,34 @@ describe('backend-gitty routes', () => {
         username: 'fake_github_user'
       });
 
-      const res2 = await agent.delete('/api/v1/github');
-      console.log('******', res2.body);
+      // delete a user
+      const res2 = await agent
+        .delete('/api/v1/github');
+      
       // unauthenticated user should not be able to post
-
       const res3 = await agent 
-      .post('/api/v1/posts')
-      .send({ text: 'Another text' })
+        .post('/api/v1/posts')
+        .send({ text: 'Another text' })
    
       expect(res3.body).toEqual({
         message: 'jwt must be provided',
         status: 500
       })
   });
+
+
+  it('should list all posts for all users', async() => {
+    const agent = request.agent(app);
+    await agent
+      .get('/api/v1/github/login/callback?code=42')
+      .redirects(1);
+    
+    const expected = await Post.getAll();
+    const res = await agent
+    .get('/api/v1/posts');
+
+    expect(res.body).toEqual(expected);
+
+  })
 });
 
