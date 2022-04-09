@@ -89,4 +89,14 @@ describe('backend-gitty routes', () => {
 
     expect(res.body).toEqual(expected);
   });
+
+  it('should return an error message if a user tries to view all posts while not logged in', async () => {
+    const res = await request(app).get('/api/v1/posts');
+    // .post('/api/v1/posts')
+    // .send({ text: 'My first text' });
+    expect(res.body).toEqual({
+      message: 'jwt must be provided',
+      status: 500,
+    });
+  });
 });
